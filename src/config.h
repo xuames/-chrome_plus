@@ -10,36 +10,6 @@ std::wstring GetCrCommandLine() {
   return L"";
 }
 
-std::wstring GetDirPath(const std::wstring& dirType) {
-  std::wstring path = CanonicalizePath(GetAppDir() + L"\\..\\" + dirType);
-  std::wstring DirBuffer(MAX_PATH, '\0');
-  ::GetPrivateProfileStringW(L"general", (dirType + L"_dir").c_str(),
-                             path.c_str(), &DirBuffer[0], MAX_PATH,
-                             kIniPath.c_str());
-  // Deprecated
-  if (DirBuffer[0] == 0) {
-    ::GetPrivateProfileStringW(L"general", (dirType + L"dir").c_str(),
-                               path.c_str(), &DirBuffer[0], MAX_PATH,
-                               kIniPath.c_str());
-  }
-  if (DirBuffer[0] == 0) {
-    DirBuffer = path;
-  }
-
-  std::wstring ExpandedPath = ExpandEnvironmentPath(DirBuffer);
-  ReplaceStringIni(ExpandedPath, L"%app%", GetAppDir());
-  std::wstring Dir = GetAbsolutePath(ExpandedPath);
-  return Dir;
-}
-
-std::wstring GetUserDataDir() {
-  return GetDirPath(L"data");
-}
-
-std::wstring GetDiskCacheDir() {
-  return GetDirPath(L"cache");
-}
-
 std::wstring GetBosskey() {
   auto key = GetIniString(L"general", L"boss_key", L"");
   if (!key.empty()) {
